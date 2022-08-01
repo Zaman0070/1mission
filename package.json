@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "core-js": "^3.24.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0"
+  }
+}
