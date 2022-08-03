@@ -10,6 +10,7 @@ import '../otp_screen.dart';
 class PhoneService {
   FirebaseService service = FirebaseService();
 
+
   FirebaseAuth auth = FirebaseAuth.instance;
   User user = FirebaseAuth.instance.currentUser;
   CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -20,6 +21,7 @@ class PhoneService {
     List<DocumentSnapshot> document = result.docs;
 
     if (document.isNotEmpty) {
+
       Navigator.push(context, MaterialPageRoute(builder: (_) => CityScreen()));
     } else {
       return service.users.doc(user.uid).set({

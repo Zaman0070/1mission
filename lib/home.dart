@@ -77,7 +77,7 @@ class _HomeState extends State<Home> {
           products.add(
             Product(
                 documentSnapshot: doc,
-                brand: doc['brand'],
+               // brand: doc['brand'],
                 category: doc['category'],
                 description: doc['discretion'],
                 postDate: doc['postedAt'],

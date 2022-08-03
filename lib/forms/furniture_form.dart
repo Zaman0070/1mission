@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:galleryimage/galleryimage.dart';
@@ -165,7 +166,8 @@ class _FurnitureFormState extends State<FurnitureForm> with TickerProviderStateM
           'price': priceController.text,
           'condition': conditionController.text,
           'discretion': descController.text,
-          'sellerUid': service.user?.uid,
+          'sellerUid': service.user.uid,
+          //'name':service.users.doc(service.user.uid).get().then((QuerySnapshot) => QuerySnapshot['name']),
           'phone': service.user.phoneNumber,
           'image': provider.urlList,
           'area': areaController.text,

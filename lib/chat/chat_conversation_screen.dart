@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marketplace_app/chat/chat_stream.dart';
 import 'package:sizer/sizer.dart';
@@ -14,20 +16,52 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   FirebaseService service = FirebaseService();
   Stream chatMessageStream;
+  DocumentSnapshot chatDoc;
   var chatMessageController = TextEditingController();
 
   bool send = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    service.getChat(widget.chatRoomId).then((value) {
+      setState(() {
+        chatMessageStream = value;
+      });
+    });
+    service.messages.doc(widget.chatRoomId).get().then((value) {
+      setState(() {
+        chatDoc = value;
+      });
+    });
+    super.initState();
+  }
 
-  sendMessage() {
+
+   sendMessage() {
+
     if (chatMessageController.text.isNotEmpty) {
       FocusScope.of(context).unfocus();
-      Map<String, dynamic> message = {
-        'message': chatMessageController.text,
-        'sentBy': service.user.uid,
-        'time': DateTime.now().microsecondsSinceEpoch,
-      };
-      service.createChat(widget.chatRoomId, message);
-      chatMessageController.clear();
+      if(FirebaseAuth.instance.currentUser.uid!=chatDoc['product']['seller']){
+        Map<String, dynamic> message = {
+          'message': chatMessageController.text,
+          'sentBy': chatDoc['users'][1],
+          'time': DateTime.now().microsecondsSinceEpoch,
+          'receiverId':chatDoc['product']['seller'],
+        };
+        service.createChat(widget.chatRoomId, message);
+        chatMessageController.clear();
+      }
+      else{
+        Map<String, dynamic> message = {
+          'message': chatMessageController.text,
+          'sentBy':chatDoc['product']['seller'],
+          'time': DateTime.now().microsecondsSinceEpoch,
+          'receiverId': chatDoc['users'][1],
+        };
+        service.createChat(widget.chatRoomId, message);
+        chatMessageController.clear();
+      }
+
     }
   }
 
@@ -52,9 +86,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 chatRoomId: widget.chatRoomId,
               ),
             ),
-
             Container(
-
               alignment: Alignment.bottomCenter,
               child: Container(
                 decoration: BoxDecoration(

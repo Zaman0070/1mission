@@ -1,10 +1,13 @@
 import 'package:adobe_xd/pinned.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:marketplace_app/Initial%20Screens/language_screen.dart';
 import 'package:marketplace_app/login.dart';
+import 'package:marketplace_app/model/token_model.dart';
 import 'package:marketplace_app/pages/city_screen.dart';
+import 'package:marketplace_app/services/firebase_service.dart';
 import 'package:marketplace_app/services/phone_service.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sizer/sizer.dart';
@@ -31,6 +34,7 @@ class _OtpScreenState extends State<OtpScreen> {
   String error = '';
 
   PhoneService _service = PhoneService();
+  FirebaseService service =FirebaseService();
 
 
   var text1 = TextEditingController();
@@ -53,7 +57,14 @@ class _OtpScreenState extends State<OtpScreen> {
       String fcmToken = await firebaseMessaging.getToken();
       //_auth.currentUser?.linkWithCredential(credential);
 
+
+
+
+
       if (user != null) {
+       final tokenRef = service.users.doc(user.uid).collection('tokens').doc(fcmToken);
+       await tokenRef.set(TokenModel(token: fcmToken,createdAt: FieldValue.serverTimestamp()).toJson());
+
         _service.users.doc(user.uid).set({
           'uid': user.uid,
           'mobile': user.phoneNumber,
@@ -63,7 +74,6 @@ class _OtpScreenState extends State<OtpScreen> {
           'followers' : [],
           'following': [],
           'description': 'Add Some Description',
-          'device_token': fcmToken,
 
         }).then((value) {
           Navigator.push(

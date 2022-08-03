@@ -178,7 +178,7 @@ class _MobileFormState extends State<MobileForm> with TickerProviderStateMixin {
           'camera': cameraController.text,
           'discretion': descController.text,
           'phone': service.user.phoneNumber,
-          'sellerUid': service.user?.uid,
+          'sellerUid': service.user.uid,
           'image': provider.urlList,
           'area': areaController.text,
           'adsType': addTypeController.text,

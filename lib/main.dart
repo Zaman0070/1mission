@@ -12,16 +12,16 @@ import 'package:sizer/sizer.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
-    description:'This channel is used for important notifications.', // description
+    description:
+        'This channel is used for important notifications.', // description
     importance: Importance.high,
     playSound: true);
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
@@ -41,6 +41,7 @@ void main() async {
     LocalizedApp(delegate, MyApp()),
   );
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({Key key}) : super(key: key);
 
@@ -59,7 +60,6 @@ class MyApp extends StatelessWidget {
               providers: [
                 Provider(create: (_) => CategoryProvider()),
                 Provider(create: (_) => ProductProvider()),
-
               ],
               child: MaterialApp(
                 debugShowCheckedModeBanner: false,

@@ -23,7 +23,6 @@ import 'chat/chat_conversation_screen.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
-
 class ProductDetailScreen extends StatefulWidget {
   @override
   _ProductDetailScreenState createState() => _ProductDetailScreenState();
@@ -33,9 +32,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   bool loading = true;
   bool follower = false;
 
-
   FirebaseService service = FirebaseService();
-
 
   @override
   void initState() {
@@ -47,7 +44,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     // TODO: implement initState
     super.initState();
   }
-
 
   // FirebaseService service = FirebaseService();
 
@@ -79,19 +75,26 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     List likeList = data['likes'];
     var date = DateTime.fromMicrosecondsSinceEpoch(data['postedAt']);
     var formatDate = DateFormat.yMMMd().format(date);
-    Future<DocumentSnapshot<Map<String, dynamic>>> snap = FirebaseFirestore.instance.collection('users').doc(service.user.uid).get();
+    Future<DocumentSnapshot<Map<String, dynamic>>> snap = FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(service.user.uid)
+        .get();
 
-
-    Widget comment(){
+    Widget comment() {
       return StreamBuilder<QuerySnapshot>(
-          stream: FirebaseFirestore.instance.collection('products').doc(data.id).collection('comments').orderBy('time').snapshots(),
-          builder: ( context,snapshot ){
-            if(snapshot.connectionState == ConnectionState.waiting){
+          stream: FirebaseFirestore.instance
+              .collection('products')
+              .doc(data.id)
+              .collection('comments')
+              .orderBy('time')
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
-            }
-            else{
+            } else {
               return Padding(
-                padding:  EdgeInsets.symmetric(horizontal: 3.w),
+                padding: EdgeInsets.symmetric(horizontal: 3.w),
                 child: ListView(
                   physics: ScrollPhysics(),
                   scrollDirection: Axis.vertical,
@@ -104,37 +107,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         Row(
                           children: [
                             CircleAvatar(
-                              backgroundImage: NetworkImage(document['userImage']),
+                              backgroundImage:
+                                  NetworkImage(document['userImage']),
                               radius: 30,
                             ),
-                            SizedBox(width: 3.w,),
+                            SizedBox(
+                              width: 3.w,
+                            ),
                             Column(
                               children: [
-                                Text(document['name'],style: TextStyle(fontSize: 14.sp),),
-                                SizedBox(height: 1.h,),
-                                Text(convertToAgo(DateTime.fromMicrosecondsSinceEpoch(document['time'])),
+                                Text(
+                                  document['name'],
+                                  style: TextStyle(fontSize: 14.sp),
+                                ),
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                Text(
+                                  convertToAgo(
+                                      DateTime.fromMicrosecondsSinceEpoch(
+                                          document['time'])),
                                   style: TextStyle(color: Colors.grey),
                                 )
                               ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 0.8.h,),
+                        SizedBox(
+                          height: 0.8.h,
+                        ),
                         Padding(
-                          padding:  EdgeInsets.only(left: 4.w),
-                          child: Text(document['comment'],style: TextStyle(fontSize: 15.sp),),
+                          padding: EdgeInsets.only(left: 4.w),
+                          child: Text(
+                            document['comment'],
+                            style: TextStyle(fontSize: 15.sp),
+                          ),
                         ),
                         Divider(),
-
                       ],
                     );
                   }).toList(),
-
                 ),
               );
             }
-          }
-      );
+          });
     }
 
     openwhatsapp() async {
@@ -161,7 +177,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       }
     }
 
-
 // GeoPoint location = productProvider.sellerDetails['location'];
 
     createChatRoom(ProductProvider productProvider) {
@@ -177,6 +192,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ];
       String chatRoomId =
           '${productProvider.productData['sellerUid']}.${service.user.uid}.${productProvider.productData.id}';
+      //String receiverId = productProvider.productData['sellerUid'];
+
+      String receiverId = productProvider.productData['sellerUid'];
+      String senderId = service.user.uid;
+
+
       Map<String, dynamic> chatData = {
         'users': users,
         'chatRoomId': chatRoomId,
@@ -247,7 +268,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 3.0.w,left: 3.w),
+            padding: EdgeInsets.only(right: 3.0.w, left: 3.w),
             child: LikeButton(
               size: 35,
               circleColor:
@@ -324,19 +345,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 // slideIndicator: CircularSlideIndicator(),
               )),
         ),
-        SizedBox(height: 0.5.h,),
-
-
+        SizedBox(
+          height: 0.5.h,
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-
               Row(
                 children: [
                   Icon(Icons.remove_red_eye_rounded),
-                  SizedBox(width: 1.w,),
+                  SizedBox(
+                    width: 1.w,
+                  ),
                   Text('${data['PostView'].length}'),
                 ],
               ),
@@ -344,645 +366,747 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ],
           ),
         ),
-         Container(
-                child: Padding(
-                  padding: EdgeInsets.all(2.h),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${data['price']} QAR',
-                          style: TextStyle(fontSize: 17.sp),
-                        ),
-                        SizedBox(height: 1.h,),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color:Theme.of(context).primaryColor == Colors.white
-                                ? Colors.grey[300].withOpacity(0.8)
-                                : Colors.grey[800].withOpacity(0.7),
-                          ),
-                          height: 17.5.h,
-                          width: 100.w,
-                          child: FutureBuilder<DocumentSnapshot>(
-                              future: FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(data['sellerUid'])
-                                  .get(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-                                if (snapshot.data == null) {
-                                  return Container();
-                                }
-
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation(
-                                            Theme.of(context).primaryColor),
-                                      ));
-                                }
-                                List followerList = snapshot.data['followers'];
-                                return  Row(
-                                  children: [
-                                    SizedBox(width: 3.w,),
-                                    CircleAvatar(
-                                      radius: 40,
-                                      backgroundColor:
-                                      Theme.of(context).primaryColor == Colors.white
-                                          ? Color(0xffF0F0F0)
-                                          : Color(0xffF0F0F0),
-                                      backgroundImage: NetworkImage(snapshot.data['imageUrl']) ??
-                                          Icon(Icons.person),
-                                    ),
-                                    SizedBox(
-                                      width: 5.w,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          height: 2.h,
-                                        ),
-                                        Text(
-                                          snapshot.data['name'],
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        SizedBox(
-                                          height: 0.5.h,
-                                        ),
-                                        Text(
-                                          'Follower ${snapshot.data['followers'].length}',
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        SizedBox(
-                                          height: 0.5.h,
-                                        ),
-                                        Text(
-                                          data['phone'],
-                                          style: TextStyle(fontSize: 14.sp),
-                                        ),
-                                        SizedBox(
-                                          height: 2.h,
-                                        ),
-                                        Row(
-                                          children: [
-                                          followerList.contains( FirebaseAuth.instance.currentUser.uid)
-                                            ?
-                                            GestureDetector(
-                                              onTap: () async {
-                                                await service
-                                                    .followUser(
-                                                  FirebaseAuth.instance.currentUser.uid,
-                                                  data['sellerUid'],
-                                                );
-
-                                                setState(() {
-                                                  _isFollowing = false;
-                                                  followers--;
-
-                                                });
-                                              },
-                                              child: Container(
-                                                height: 4.h,
-                                                width: 24.w,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color:
-                                                      Theme.of(context).shadowColor,
-                                                    ),
-                                                    borderRadius:
-                                                    BorderRadius.circular(6)),
-                                                child: Center(
-                                                  child: Text(
-                                                      "Unfollow"
-                                                  ),
-                                                ),
-                                              ),
-                                            ):GestureDetector(
-                                              onTap: () async {
-                                                await service
-                                                    .followUser(
-                                                  FirebaseAuth.instance.currentUser.uid,
-                                                  data['sellerUid'],
-                                                );
-
-                                                setState(() {
-                                                  _isFollowing = true;
-                                                  followers++;
-
-                                                });
-                                              },
-                                              child: Container(
-                                                height: 4.h,
-                                                width: 24.w,
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 10),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color:
-                                                      Theme.of(context).shadowColor,
-                                                    ),
-                                                    borderRadius:
-                                                    BorderRadius.circular(6)),
-                                                child: Center(
-                                                  child: Text(
-                                                      "Follow"
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 5.w,
-                                            ),
-                                            InkWell(
-                                              onTap: () async {
-                                                await FlutterPhoneDirectCaller
-                                                    .callNumber(data['phone']);
-                                              },
-                                              child: Container(
-                                                height: 4.h,
-                                                width: 20.w,
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color:
-                                                      Theme.of(context).shadowColor,
-                                                    ),
-                                                    borderRadius:
-                                                    BorderRadius.circular(6)),
-                                                child: Center(child: Text('Contact')),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )
-
-                                  ],
-                                );
-
-                              }),
-                        ),
-                        SizedBox(height: 1.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Category',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['category'])
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Add Type',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['adsType'])
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('City',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['area'])
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                          ],
-                        ),
-                        SizedBox(height: 1.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Model',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    if (data['brand'] == 'other')
-                                    Text(data['customBrand']),
-                                    Text(data['brand']),
-
-
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Color',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['color'])
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Condition',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['condition'])
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                          ],
-                        ),
-                        SizedBox(height: 1.h,),
-                        if (data['category'] == 'Cars')
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:  EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('Km',style: TextStyle(
-                                        fontSize: 13.5.sp,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['kmDriver'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('Gear Type',style: TextStyle(
-                                        fontSize: 13.5.sp,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['transmission'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:  EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('No. of Owner',style: TextStyle(
-                                        fontSize: 12.5.sp,
-                                        overflow: TextOverflow.ellipsis,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['noOfOwners'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                        SizedBox(height: 1.h,),
-                        if (data['category'] == 'Mobiles')
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('Sim',style: TextStyle(
-                                        fontSize: 13.5.sp,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['sim'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('Storage',style: TextStyle(
-                                        fontSize: 13.5.sp,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['storage'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 9.h,
-                                width: 29.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:Theme.of(context).primaryColor == Colors.white
-                                      ? Colors.grey[300].withOpacity(0.8)
-                                      : Colors.grey[800].withOpacity(0.7),
-                                ),
-                                child: Padding(
-                                  padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 1.h,),
-                                      Text('Camera',style: TextStyle(
-                                        fontSize: 13.5.sp,
-                                        color:Theme.of(context).primaryColor == Colors.white
-                                            ? Colors.grey[700].withOpacity(0.8)
-                                            : Colors.grey[300].withOpacity(0.7),
-
-                                      ),),
-                                      SizedBox(height: 1.h,),
-                                      Text(data['camera'])
-                                    ],
-                                  ),
-                                ),
-                              ),
-
-                            ],
-                          ),
-                        if (data['category'] == 'Cars')
-                          if (data['category'] == 'Mobiles')
-                        SizedBox(height: 1.h,),
-                        SizedBox(height: 1.h,),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            if (data['category'] == 'Cars')
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:  EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Fuel Type',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['fuel'])
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            Container(
-                              height: 8.5.h,
-                              width: 29.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color:Theme.of(context).primaryColor == Colors.white
-                                    ? Colors.grey[300].withOpacity(0.8)
-                                    : Colors.grey[800].withOpacity(0.7),
-                              ),
-                              child: Padding(
-                                padding:   EdgeInsets.only(left: 3.w,right: 3.w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 1.h,),
-                                    Text('Guarantee',style: TextStyle(
-                                      fontSize: 13.5.sp,
-                                      color:Theme.of(context).primaryColor == Colors.white
-                                          ? Colors.grey[700].withOpacity(0.8)
-                                          : Colors.grey[300].withOpacity(0.7),
-
-                                    ),),
-                                    SizedBox(height: 1.h,),
-                                    Text(data['guarantee'])
-                                  ],
-                                ),
-                              ),
-                            ),
-
-
-                          ],
-                        ),
-                        SizedBox(height: 2.h,),
-                        Text('Description',
-                        style: TextStyle(
-                          color:Theme.of(context).primaryColor == Colors.white
-                              ? Colors.grey[700].withOpacity(0.8)
-                              : Colors.grey[300].withOpacity(0.7),
-                          fontSize: 17.sp
-                        ),
-                        ),
-                        SizedBox(height: 1.h,),
-                        Text(data['discretion'],
-                        style: TextStyle(fontSize: 15.sp),
-                        ),
-                      ]),
-                ),
+        Container(
+          child: Padding(
+            padding: EdgeInsets.all(2.h),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                '${data['price']} QAR',
+                style: TextStyle(fontSize: 17.sp),
               ),
+              SizedBox(
+                height: 1.h,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Theme.of(context).primaryColor == Colors.white
+                      ? Colors.grey[300].withOpacity(0.8)
+                      : Colors.grey[800].withOpacity(0.7),
+                ),
+                height: 17.5.h,
+                width: 100.w,
+                child: FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(data['sellerUid'])
+                        .get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.data == null) {
+                        return Container();
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(
+                              Theme.of(context).primaryColor),
+                        ));
+                      }
+                      List followerList = snapshot.data['followers'];
+                      return Row(
+                        children: [
+                          SizedBox(
+                            width: 3.w,
+                          ),
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundColor:
+                                Theme.of(context).primaryColor == Colors.white
+                                    ? Color(0xffF0F0F0)
+                                    : Color(0xffF0F0F0),
+                            backgroundImage:
+                                NetworkImage(snapshot.data['imageUrl']) ??
+                                    Icon(Icons.person),
+                          ),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 2.h,
+                              ),
+                              Text(
+                                snapshot.data['name'],
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
+                              SizedBox(
+                                height: 0.5.h,
+                              ),
+                              Text(
+                                'Follower ${snapshot.data['followers'].length}',
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
+                              SizedBox(
+                                height: 0.5.h,
+                              ),
+                              Text(
+                                data['phone'],
+                                style: TextStyle(fontSize: 14.sp),
+                              ),
+                              SizedBox(
+                                height: 2.h,
+                              ),
+                              Row(
+                                children: [
+                                  followerList.contains(
+                                          FirebaseAuth.instance.currentUser.uid)
+                                      ? GestureDetector(
+                                          onTap: () async {
+                                            await service.followUser(
+                                              FirebaseAuth
+                                                  .instance.currentUser.uid,
+                                              data['sellerUid'],
+                                            );
+
+                                            setState(() {
+                                              _isFollowing = false;
+                                              followers--;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 4.h,
+                                            width: 24.w,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Theme.of(context)
+                                                      .shadowColor,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: Center(
+                                              child: Text("Unfollow"),
+                                            ),
+                                          ),
+                                        )
+                                      : GestureDetector(
+                                          onTap: () async {
+                                            await service.followUser(
+                                              FirebaseAuth
+                                                  .instance.currentUser.uid,
+                                              data['sellerUid'],
+                                            );
+
+                                            setState(() {
+                                              _isFollowing = true;
+                                              followers++;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: 4.h,
+                                            width: 24.w,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Theme.of(context)
+                                                      .shadowColor,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(6)),
+                                            child: Center(
+                                              child: Text("Follow"),
+                                            ),
+                                          ),
+                                        ),
+                                  SizedBox(
+                                    width: 5.w,
+                                  ),
+                                  InkWell(
+                                    onTap: () async {
+                                      await FlutterPhoneDirectCaller.callNumber(
+                                          data['phone']);
+                                    },
+                                    child: Container(
+                                      height: 4.h,
+                                      width: 20.w,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color:
+                                                Theme.of(context).shadowColor,
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(6)),
+                                      child: Center(child: Text('Contact')),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      );
+                    }),
+              ),
+              SizedBox(
+                height: 1.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Category',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['category'])
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Add Type',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['adsType'])
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'City',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['area'])
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 1.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Model',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          if (data['brand'] == 'other')
+                            Text(data['customBrand']),
+                          Text(data['brand']),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Color',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['color'])
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Condition',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['condition'])
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 1.h,
+              ),
+              if (data['category'] == 'Cars')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Km',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['kmDriver'])
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Gear Type',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['transmission'])
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'No. of Owner',
+                              style: TextStyle(
+                                fontSize: 12.5.sp,
+                                overflow: TextOverflow.ellipsis,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['noOfOwners'])
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              SizedBox(
+                height: 1.h,
+              ),
+              if (data['category'] == 'Mobiles')
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Sim',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['sim'])
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Storage',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['storage'])
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 9.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Camera',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['camera'])
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              if (data['category'] == 'Cars')
+                if (data['category'] == 'Mobiles')
+                  SizedBox(
+                    height: 1.h,
+                  ),
+              SizedBox(
+                height: 1.h,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  if (data['category'] == 'Cars')
+                    Container(
+                      height: 8.5.h,
+                      width: 29.w,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Theme.of(context).primaryColor == Colors.white
+                            ? Colors.grey[300].withOpacity(0.8)
+                            : Colors.grey[800].withOpacity(0.7),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(
+                              'Fuel Type',
+                              style: TextStyle(
+                                fontSize: 13.5.sp,
+                                color: Theme.of(context).primaryColor ==
+                                        Colors.white
+                                    ? Colors.grey[700].withOpacity(0.8)
+                                    : Colors.grey[300].withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 1.h,
+                            ),
+                            Text(data['fuel'])
+                          ],
+                        ),
+                      ),
+                    ),
+                  Container(
+                    height: 8.5.h,
+                    width: 29.w,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Theme.of(context).primaryColor == Colors.white
+                          ? Colors.grey[300].withOpacity(0.8)
+                          : Colors.grey[800].withOpacity(0.7),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 3.w, right: 3.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(
+                            'Guarantee',
+                            style: TextStyle(
+                              fontSize: 13.5.sp,
+                              color:
+                                  Theme.of(context).primaryColor == Colors.white
+                                      ? Colors.grey[700].withOpacity(0.8)
+                                      : Colors.grey[300].withOpacity(0.7),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 1.h,
+                          ),
+                          Text(data['guarantee'])
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 2.h,
+              ),
+              Text(
+                'Description',
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor == Colors.white
+                        ? Colors.grey[700].withOpacity(0.8)
+                        : Colors.grey[300].withOpacity(0.7),
+                    fontSize: 17.sp),
+              ),
+              SizedBox(
+                height: 1.h,
+              ),
+              Text(
+                data['discretion'],
+                style: TextStyle(fontSize: 15.sp),
+              ),
+            ]),
+          ),
+        ),
         SizedBox(
           height: 3.h,
         ),
@@ -991,25 +1115,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-             CircleAvatar(
-               radius: 18,
-               backgroundColor: Color(0xff1DA1F2),
-               child: Image.asset('assets/social/twitter.png',height:3.5.h),
-             ),
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: Color(0xff1DA1F2),
+                child: Image.asset('assets/social/twitter.png', height: 3.5.h),
+              ),
               CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xff4867AA),
-                child: Image.asset('assets/social/facebook.png',height:3.5.h),
+                child: Image.asset('assets/social/facebook.png', height: 3.5.h),
               ),
               CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xff56F074),
-                child: Image.asset('assets/social/whatsapp.png',height:3.h),
+                child: Image.asset('assets/social/whatsapp.png', height: 3.h),
               ),
               CircleAvatar(
                 radius: 18,
                 backgroundColor: Color(0xffD33F72),
-                child: Image.asset('assets/social/instagram.png',height:3.h),
+                child: Image.asset('assets/social/instagram.png', height: 3.h),
               ),
               CircleAvatar(
                 radius: 18,
@@ -1020,136 +1144,117 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 height: 3.5.h,
                 width: 17.w,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  border:Border.all(
-                    color: Theme.of(context).shadowColor
-                  )
-                ),
-                child: Center(child: Text('Report',style: TextStyle(color: Colors.grey[400]),)),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Theme.of(context).shadowColor)),
+                child: Center(
+                    child: Text(
+                  'Report',
+                  style: TextStyle(color: Colors.grey[400]),
+                )),
               ),
               likeList.contains(service.user.uid)
                   ? GestureDetector(
-                onTap: () async {
-               await  service.likePost(
-                     data.id,
-                     FirebaseAuth.instance.currentUser.uid,
-                     context);
-                  setState(() {
-                    isLikeAnimating = false;
-
-                  });
-                },
-                child: Container(
-                  height: 3.5.h,
-                  width: 20.w,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 10),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color:
-                        Theme.of(context).shadowColor,
+                      onTap: () async {
+                        await service.likePost(data.id,
+                            FirebaseAuth.instance.currentUser.uid, context);
+                        setState(() {
+                          isLikeAnimating = false;
+                        });
+                      },
+                      child: Container(
+                        height: 3.5.h,
+                        width: 20.w,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).shadowColor,
+                            ),
+                            borderRadius: BorderRadius.circular(6)),
+                        child: Center(
+                          child: Text("DisLike",
+                              style: TextStyle(color: Colors.grey[400])),
+                        ),
                       ),
-                      borderRadius:
-                      BorderRadius.circular(6)),
-                  child: Center(
-                    child: Text(
-                        "DisLike",
-                        style: TextStyle(color: Colors.grey[400])
-                    ),
-                  ),
-                ),
-              ):GestureDetector(
-                onTap: () async {
-                await  service.likePost(
-                      data.id,
-                      FirebaseAuth.instance.currentUser.uid,
-                      context);
+                    )
+                  : GestureDetector(
+                      onTap: () async {
+                        await service.likePost(data.id,
+                            FirebaseAuth.instance.currentUser.uid, context);
 
-                  setState(() {
-                    isLikeAnimating = true;
-
-                  });
-                },
-                child: Container(
-                  height: 3.5.h,
-                  width: 20.w,
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 10),
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color:
-                        Theme.of(context).shadowColor,
+                        setState(() {
+                          isLikeAnimating = true;
+                        });
+                      },
+                      child: Container(
+                        height: 3.5.h,
+                        width: 20.w,
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Theme.of(context).shadowColor,
+                            ),
+                            borderRadius: BorderRadius.circular(6)),
+                        child: Center(
+                          child: Text("Like",
+                              style: TextStyle(color: Colors.grey[400])),
+                        ),
                       ),
-                      borderRadius:
-                      BorderRadius.circular(6)),
-                  child: Center(
-                    child: Text(
-                        "Like",
-                        style: TextStyle(color: Colors.grey[400])
                     ),
-                  ),
-                ),
-              ),
-
-
-
             ],
           ),
         ),
         SizedBox(
           height: 3.h,
         ),
-
         comment(),
         SizedBox(
           height: 1.5.h,
         ),
         Padding(
-          padding:  EdgeInsets.symmetric(horizontal: 3.w),
+          padding: EdgeInsets.symmetric(horizontal: 3.w),
           child: Column(
             children: [
               Container(
-                height:10.h,
+                height: 10.h,
                 decoration: BoxDecoration(
-                  color:Theme.of(context).primaryColor == Colors.white
+                  color: Theme.of(context).primaryColor == Colors.white
                       ? Colors.grey[300].withOpacity(0.8)
                       : Colors.grey[800].withOpacity(0.7),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: TextField(
-
                   maxLines: 2,
                   controller: commentController,
                   decoration: InputDecoration(
-                    border: InputBorder.none,
-                      hintText: 'Enter Comment here...'
-                  ),
+                      border: InputBorder.none,
+                      hintText: 'Enter Comment here...'),
                 ),
               ),
               SizedBox(
                 height: 1.h,
               ),
               InkWell(
-                onTap: (){
+                onTap: () {
                   addComment(data.id, commentController.text);
                   commentController.clear();
                 },
                 child: Container(
                   height: 6.h,
-                 decoration: BoxDecoration(
-                   color: Theme.of(context).shadowColor,
-                   borderRadius: BorderRadius.circular(6),
-                 ),
-                  child: Center(child: Text('Comment',style: TextStyle(fontSize: 15.sp,fontWeight: FontWeight.bold),)),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).shadowColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Center(
+                      child: Text(
+                    'Comment',
+                    style:
+                        TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+                  )),
                 ),
               ),
             ],
           ),
         ),
-
-
-
-
       ]),
       bottomNavigationBar: BottomAppBar(
         color: Theme.of(context).primaryColor,
@@ -1158,7 +1263,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           child: productProvider.productData['sellerUid'] == service.user.uid
               ? InkWell(
                   onTap: () {
-                   // Navigator.pop(context);
+                    // Navigator.pop(context);
                   },
                   child: Container(
                     height: 5.h,
@@ -1315,29 +1420,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       ),
     );
   }
+
   var commentController = TextEditingController();
 
   bool send = false;
 
-
-  Future<void> addComment(String postId,String comment)async{
+  Future<void> addComment(String postId, String comment) async {
     String commentId = const Uuid().v1();
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection("users").where('uid',isEqualTo: service.user.uid).get();
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection("users")
+        .where('uid', isEqualTo: service.user.uid)
+        .get();
     for (var element in snapshot.docs) {
-      FirebaseFirestore.instance.collection('products').doc(postId).collection('comments').doc(commentId).set(
-          {
-            'comment' : comment,
-            'userUid' :service.user.uid,
-            'time' : DateTime.now().microsecondsSinceEpoch,
-            'name' : element['name'],
-            'userImage' :element['imageUrl'],
-          }
-      );
-
+      FirebaseFirestore.instance
+          .collection('products')
+          .doc(postId)
+          .collection('comments')
+          .doc(commentId)
+          .set({
+        'comment': comment,
+        'userUid': service.user.uid,
+        'time': DateTime.now().microsecondsSinceEpoch,
+        'name': element['name'],
+        'userImage': element['imageUrl'],
+      });
     }
-
   }
-
-
 }
 //42.31
