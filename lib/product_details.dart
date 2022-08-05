@@ -256,6 +256,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ))
         .toList();
 
+
+    Future<void> addComment(String postId, String comment) async {
+      String commentId = const Uuid().v1();
+      QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .where('uid', isEqualTo: service.user.uid)
+          .get();
+      for (var element in snapshot.docs) {
+        FirebaseFirestore.instance
+            .collection('products')
+            .doc(postId)
+            .collection('comments')
+            .doc(commentId)
+            .set({
+          'comment': comment,
+          'userUid': service.user.uid,
+          'time': DateTime.now().microsecondsSinceEpoch,
+          'name': element['name'],
+          'userImage': element['imageUrl'],
+          'sellerUid' : data['sellerUid'],
+        });
+      }
+    }
+
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).canvasColor,
@@ -1425,26 +1450,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   bool send = false;
 
-  Future<void> addComment(String postId, String comment) async {
-    String commentId = const Uuid().v1();
-    QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection("users")
-        .where('uid', isEqualTo: service.user.uid)
-        .get();
-    for (var element in snapshot.docs) {
-      FirebaseFirestore.instance
-          .collection('products')
-          .doc(postId)
-          .collection('comments')
-          .doc(commentId)
-          .set({
-        'comment': comment,
-        'userUid': service.user.uid,
-        'time': DateTime.now().microsecondsSinceEpoch,
-        'name': element['name'],
-        'userImage': element['imageUrl'],
-      });
-    }
-  }
+
 }
 //42.31
